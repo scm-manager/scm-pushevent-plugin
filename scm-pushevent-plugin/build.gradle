@@ -31,6 +31,7 @@ dependencies {
   // define dependencies to other plugins here e.g.:
   // plugin "sonia.scm.plugins:scm-mail-plugin:2.1.0"
   // optionalPlugin "sonia.scm.plugins:scm-editor-plugin:2.0.0"
+  plugin "sonia.scm.plugins:scm-pathwp-plugin:2.0.2" // needed for path collection
 }
 
 scmPlugin {

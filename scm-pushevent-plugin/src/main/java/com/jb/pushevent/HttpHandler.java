@@ -23,7 +23,7 @@ public class HttpHandler extends AdvancedHttpClient {
 
     AdvancedHttpClient client = new HttpHandler();
 
-    AdvancedHttpResponse response = client.post("https://www.scm-manager.org")
+    AdvancedHttpResponse response = client.post("localhost.org")
       .formContent()
       .field("firstname", "Tricia")
       .field("lastname", "McMillan")
