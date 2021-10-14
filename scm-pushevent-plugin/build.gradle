@@ -28,6 +28,15 @@ plugins {
 }
 
 dependencies {
+  implementation 'junit:junit:4.12'
+
+  implementation 'com.google.code.gson:gson:2.8.8'
+  implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
+  
+  // https://mvnrepository.com/artifact/org.mockito/mockito-inline
+  testImplementation 'org.mockito:mockito-inline:2.7.21'
+
+
   // define dependencies to other plugins here e.g.:
   // plugin "sonia.scm.plugins:scm-mail-plugin:2.1.0"
   // optionalPlugin "sonia.scm.plugins:scm-editor-plugin:2.0.0"
