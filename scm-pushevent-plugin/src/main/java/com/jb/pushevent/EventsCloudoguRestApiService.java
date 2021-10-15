@@ -3,7 +3,8 @@ package com.jb.pushevent;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jb.pushevent.push.Push;
+import com.jb.pushevent.dto.Event;
+import com.jb.pushevent.dto.Push;
 import sonia.scm.net.ahc.AdvancedHttpClient;
 import sonia.scm.net.ahc.AdvancedHttpRequestWithBody;
 import sonia.scm.net.ahc.AdvancedHttpResponse;
@@ -28,16 +29,18 @@ public class EventsCloudoguRestApiService {
     return postRequest;
   }
 
+  /*
   private ObjectNode wrapPush(Push push) {
     final ObjectNode wrapper = objectMapper.createObjectNode();
     wrapper.set("push", push.toJsonNode());
     return wrapper;
   }
+  */
 
 
-  public void sendPush(Push push) throws Exception {
+  public void sendPush(Event eventDto) throws Exception {
     // Construct Request
-    AdvancedHttpRequestWithBody postRequest = createPostRequest(wrapPush(push));
+    AdvancedHttpRequestWithBody postRequest = createPostRequest(eventDto.toJsonNode());
 
     final AdvancedHttpResponse postPushResponse;
     try {

@@ -4,10 +4,11 @@ package com.jb.pushevent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Iterables;
+import com.jb.pushevent.dto.Event;
 import com.jb.pushevent.pathcollect.PathCollectFactory;
 import com.jb.pushevent.pathcollect.PathCollector;
-import com.jb.pushevent.push.Commit;
-import com.jb.pushevent.push.Push;
+import com.jb.pushevent.dto.Commit;
+import com.jb.pushevent.dto.Push;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sonia.scm.EagerSingleton;
@@ -57,10 +58,10 @@ public class PushEventSubscriber {
 
       if (!Iterables.isEmpty(changesets)) {
         try {
-          Push push = handlePush(repository, changesets, event);
+          Event eventDto = handlePush(repository, changesets, event);
           // send Push to REST-Api
           EventsCloudoguRestApiService restApiService = new EventsCloudoguRestApiService(httpClientProvider.get());
-          restApiService.sendPush(push);
+          restApiService.sendPush(eventDto);
         } catch (IOException e) {
           e.printStackTrace();
         } catch (Exception e) {
@@ -74,8 +75,13 @@ public class PushEventSubscriber {
     }
   }
 
-  private Push handlePush(Repository repository, Iterable<Changeset> changesets, RepositoryHookEvent event) throws IOException {
-    return createPushObjectFromEvent(repository, changesets, event);
+  private Event handlePush(Repository repository, Iterable<Changeset> changesets, RepositoryHookEvent event) throws IOException {
+    Push push = createPushObjectFromEvent(repository, changesets, event);
+    Event eventDto = new Event(new ObjectMapper().createObjectNode());
+    eventDto.setData(push);
+    eventDto.setId("id");
+    eventDto.setTime("time");
+    return eventDto;
   }
 
   Push createPushObjectFromEvent(Repository repository, Iterable<Changeset> changesets, RepositoryHookEvent event) throws IOException {
