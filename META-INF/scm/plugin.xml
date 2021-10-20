@@ -10,10 +10,9 @@
         <author>Jasper Bartscher</author>
     </information>
     <dependencies>
-        <dependency version="2.9.0">scm-pushlog-plugin</dependency>
+
     </dependencies>
     <subscriber>
-        <class>com.cloudogu.scw.PushRequestEventSubscriber</class>
-        <event>com.cloudogu.scm.review.pushrequest.service.PushRequestEvent</event>
+
     </subscriber>
 </plugin>

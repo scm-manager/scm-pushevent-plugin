@@ -15,20 +15,24 @@ public class Push {
 
   private final ObjectNode node;
 
+  // todo NAMESPACE + Name ist eindeutig Name allein nicht!
+
   private String id;
   private String author;
 
   private String instanceId;
 
-  private Long datePushed;
+  private Long datePushed; // client timestamp
 
   private String repositoryId;
+  private String repositoryNamespace;
   private String repositoryName;
 
   private Set<Commit> commits;
-  private Commit lastCommit;
 
-  private Set<String> filesChangedOverall = new HashSet<>();
+  // private Commit lastCommit;
+
+  // private Set<String> filesChangedOverall = new HashSet<>();
 
   public Push(ObjectNode node) {
     this.node = node;
@@ -54,11 +58,6 @@ public class Push {
     node.put("datePushed", this.datePushed);
   }
 
-  public void setLastCommit(Commit lastCommit) {
-    this.lastCommit = lastCommit;
-    node.set("pushCommit", this.lastCommit.toJsonNode());
-  }
-
   public void setRepositoryId(String repositoryId) {
     this.repositoryId = repositoryId;
     node.put("repositoryId", this.repositoryId);
@@ -67,6 +66,11 @@ public class Push {
   public void setRepositoryName(String repositoryName) {
     this.repositoryName = repositoryName;
     node.put("repositoryName", this.repositoryName);
+  }
+
+  public void setRepositoryNamespace(String repositoryNamespace) {
+    this.repositoryNamespace = repositoryNamespace;
+    node.put("repositoryNamespace", this.repositoryNamespace);
   }
 
   public void addCommit(Commit c) {
@@ -82,12 +86,6 @@ public class Push {
     commits.forEach(commit -> {
       arrayNode.add(commit.toJsonNode());
     });
-  }
-
-  public void setFilesChangedOverall(Set<String> filesChangedOverall) {
-    this.filesChangedOverall = filesChangedOverall;
-    ArrayNode arrayNode = node.putArray("filesChangedOverall");
-    filesChangedOverall.forEach(arrayNode::add);
   }
 
   public JsonNode toJsonNode() {

@@ -1,5 +1,7 @@
 package com.jb.pushevent.pathcollect;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jb.pushevent.dto.FileChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sonia.scm.repository.Changeset;
@@ -8,46 +10,49 @@ import sonia.scm.repository.api.RepositoryService;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
- * This class is a duplication of the implementation in scm-pathwp-plugin/src/main/java/sonia/scm/pathwp/PathCollector.java v2.0.2
- * normally the dependency to the scm-pathwp-plugin in build.gradle would solve this but the class is package private and as such not usable in
- * other plugin projects
- * <p>
- * Remove this class if the implementation in https://github.com/scm-manager/scm-pathwp-plugin/blob/5f21ff1b27814662155acd8933f331b20e6421d4/src/main/java/sonia/scm/pathwp/PathCollector.java#L37
- * is publicly available
+ * The PathCollector class collects all types of modifications which are part of a changeset.
+ *
+ * These modification types are additions, modifications, coping of files, moving of files and file removables.
  */
 public class PathCollector implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(PathCollector.class);
 
   private final RepositoryService repositoryService;
-  private final Set<String> paths = new HashSet<>();
+
+  private final Set<String> added = new HashSet<>();
+  private final Set<String> removed = new HashSet<>();
+  private final Set<String> modified = new HashSet<>();
+  private final Set<String> copied = new HashSet<>();
+  private final Set<String> moved = new HashSet<>();
+
+  FileChanges fileChanges = new FileChanges(new ObjectMapper().createObjectNode());
+
 
   PathCollector(RepositoryService repositoryService) {
     this.repositoryService = repositoryService;
   }
 
-  public Set<String> collectAll(Iterable<Changeset> changesets) throws IOException {
-    paths.clear();
+  public FileChanges collectAll(Iterable<Changeset> changesets) throws IOException {
+    added.clear();
+    removed.clear();
+    modified.clear();
+    copied.clear();
+    moved.clear();
     for (Changeset c : changesets) {
       collect(c);
     }
-    return paths;
-  }
-
-  public Set<String> collectSingle(Changeset changeset) throws IOException {
-    paths.clear();
-    collect(changeset);
-    return paths;
+    return fileChanges;
   }
 
   private void collect(Changeset changeset) throws IOException {
     Modifications modifications = repositoryService.getModificationsCommand()
       .revision(changeset.getId())
       .getModifications();
+
 
     if (modifications != null) {
       collect(modifications);
@@ -57,13 +62,31 @@ public class PathCollector implements Closeable {
   }
 
   private void collect(Modifications modifications) {
-    append(modifications.getEffectedPaths());
+    modifications.getAdded().forEach((add) -> {
+      appendNormalizedPathToSet(added, add.toString());
+    });
+    modifications.getRemoved().forEach((rmv) -> {
+      appendNormalizedPathToSet(removed, rmv.toString());
+    });
+    modifications.getModified().forEach((mod) -> {
+      appendNormalizedPathToSet(modified, mod.toString());
+    });
+    modifications.getRenamed().forEach((mov) -> {
+      appendNormalizedPathToSet(moved, mov.toString());
+    });
+    modifications.getAdded().forEach((cpy) -> {
+      appendNormalizedPathToSet(copied, cpy.toString());
+    });
+
+    fileChanges.setAdded(added);
+    fileChanges.setRemoved(removed);
+    fileChanges.setModified(modified);
+    fileChanges.setMoved(moved);
+    fileChanges.setCopied(copied);
   }
 
-  private void append(Iterable<String> modifiedPaths) {
-    for (String path : modifiedPaths) {
-      paths.add(normalizePath(path));
-    }
+  private void appendNormalizedPathToSet(Set<String> modificationSet, String modifiedPaths) {
+    modificationSet.add(normalizePath(modifiedPaths));
   }
 
   private String normalizePath(String path) {

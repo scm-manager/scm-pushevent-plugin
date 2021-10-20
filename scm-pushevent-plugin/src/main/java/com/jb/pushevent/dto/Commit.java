@@ -1,6 +1,7 @@
 package com.jb.pushevent.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.*;
@@ -17,7 +18,7 @@ public class Commit {
   private String commitMessage;
   private Long dateCommitted;
   private String author;
-  private Set<String> filesChanged = new HashSet<>();
+  private FileChanges fileChanges = new FileChanges(new ObjectMapper().createObjectNode());
 
   public Commit(ObjectNode node) {
     this.node = node;
@@ -38,10 +39,9 @@ public class Commit {
     node.put("dateCommitted", dateCommitted);
   }
 
-  public void setFilesChanged(Set<String> filesChanged) {
-    this.filesChanged = filesChanged;
-    ArrayNode arrayNode = node.putArray("filesChanged");
-    filesChanged.forEach(arrayNode::add);
+  public void setFilesChanged(FileChanges changes) {
+    this.fileChanges = changes;
+    node.set("fileChanges", changes.toJsonNode());
   }
 
   public void setAuthor(String author) {

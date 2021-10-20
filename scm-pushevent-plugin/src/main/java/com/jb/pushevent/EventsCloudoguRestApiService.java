@@ -46,7 +46,7 @@ public class EventsCloudoguRestApiService {
     try {
       postPushResponse = postRequest.request();
       if (!postPushResponse.isSuccessful()) {
-        throw new Exception("REEEEEEEEE"); //TODO: build own exception class
+        throw new Exception("TODO OWN EXCEPTION CLASS"); //TODO: build own exception class
       }
     } catch (IOException e) {
       e.printStackTrace();

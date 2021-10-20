@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Iterables;
 import com.jb.pushevent.dto.Event;
+import com.jb.pushevent.dto.FileChanges;
 import com.jb.pushevent.pathcollect.PathCollectFactory;
 import com.jb.pushevent.pathcollect.PathCollector;
 import com.jb.pushevent.dto.Commit;
@@ -25,9 +26,9 @@ import sonia.scm.repository.api.HookFeature;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
+
 
 @Extension
 @EagerSingleton
@@ -43,7 +44,6 @@ public class PushEventSubscriber {
     this.pathCollectorFactory = pathCollectorFactory;
     this.httpClientProvider = httpClientProvider;
   }
-
 
   @Subscribe
   public void onEvent(PostReceiveRepositoryHookEvent event) {
@@ -76,7 +76,7 @@ public class PushEventSubscriber {
   }
 
   private Event handlePush(Repository repository, Iterable<Changeset> changesets, RepositoryHookEvent event) throws IOException {
-    Push push = createPushObjectFromEvent(repository, changesets, event);
+    Push push = createPushDtoFromEvent(repository, changesets, event);
     Event eventDto = new Event(new ObjectMapper().createObjectNode());
     eventDto.setData(push);
     eventDto.setId("id");
@@ -84,12 +84,13 @@ public class PushEventSubscriber {
     return eventDto;
   }
 
-  Push createPushObjectFromEvent(Repository repository, Iterable<Changeset> changesets, RepositoryHookEvent event) throws IOException {
+  Push createPushDtoFromEvent(Repository repository, Iterable<Changeset> changesets, RepositoryHookEvent event) throws IOException {
     ObjectNode objectNode = new ObjectMapper().createObjectNode();
     Push push = new Push(objectNode);
 
     push.setRepositoryId(repository.getId());
     push.setRepositoryName(repository.getName());
+    push.setRepositoryNamespace(repository.getNamespace());
 
     push.setInstanceId("NO YET IMPLEMENTED");
 
@@ -98,8 +99,7 @@ public class PushEventSubscriber {
     while (changesetsIter.hasNext()) {
       Changeset changeset = (Changeset) changesetsIter.next();
 
-      objectNode = new ObjectMapper().createObjectNode();
-      Commit commit = new Commit(objectNode);
+      Commit commit = new Commit(new ObjectMapper().createObjectNode());
 
       commit.setCommitId(changeset.getId());
       commit.setCommitMessage(changeset.getDescription());
@@ -110,33 +110,31 @@ public class PushEventSubscriber {
       // last commit reached
       if (!changesetsIter.hasNext()) {
         push.setDatePushed(commit.getDateCommitted());
-        push.setLastCommit(commit);
         push.setAuthor(changeset.getAuthor().toString());
       }
     }
     push.setCommits(push.getCommits()); // this is necessary as addCommit does not update the json-node
-    push.setFilesChangedOverall(collectAllPaths(event.getContext(), repository));
-
     return push;
   }
 
 
-  private Set<String> collectAllPaths(HookContext eventContext, Repository repository) throws IOException {
+  private FileChanges collectAllPaths(HookContext eventContext, Repository repository) throws IOException {
     if (eventContext.isFeatureSupported(HookFeature.CHANGESET_PROVIDER)) {
+
       try (PathCollector collector = pathCollectorFactory.create(repository)) {
         return collector.collectAll(eventContext.getChangesetProvider().getChangesets());
       }
     }
-    return Collections.emptySet();
+    return new FileChanges(new ObjectMapper().createObjectNode()); //empty object
   }
 
-  private Set<String> collectPaths(HookContext eventContext, Repository repository, Changeset changeset) throws IOException {
+  private FileChanges collectPaths(HookContext eventContext, Repository repository, Changeset changeset) throws IOException {
     if (eventContext.isFeatureSupported(HookFeature.CHANGESET_PROVIDER)) {
       try (PathCollector collector = pathCollectorFactory.create(repository)) {
-        return collector.collectSingle(changeset);
+        return collector.collectAll(List.of(changeset));
       }
     }
-    return Collections.emptySet();
+    return new FileChanges(new ObjectMapper().createObjectNode()); //empty object
   }
 
 }
