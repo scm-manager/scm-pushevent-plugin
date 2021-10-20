@@ -14,7 +14,7 @@ import java.util.*;
 
 /**
  * The PathCollector class collects all types of modifications which are part of a changeset.
- *
+ * <p>
  * These modification types are additions, modifications, coping of files, moving of files and file removables.
  */
 public class PathCollector implements Closeable {
@@ -63,19 +63,19 @@ public class PathCollector implements Closeable {
 
   private void collect(Modifications modifications) {
     modifications.getAdded().forEach((add) -> {
-      appendNormalizedPathToSet(added, add.toString());
+      appendNormalizedPathToSet(added, add.getPath());
     });
     modifications.getRemoved().forEach((rmv) -> {
-      appendNormalizedPathToSet(removed, rmv.toString());
+      appendNormalizedPathToSet(removed, rmv.getPath());
     });
     modifications.getModified().forEach((mod) -> {
-      appendNormalizedPathToSet(modified, mod.toString());
+      appendNormalizedPathToSet(modified, mod.getPath());
     });
     modifications.getRenamed().forEach((mov) -> {
-      appendNormalizedPathToSet(moved, mov.toString());
+      appendNormalizedPathToSet(moved, mov.getOldPath() + " --> " + mov.getNewPath());
     });
-    modifications.getAdded().forEach((cpy) -> {
-      appendNormalizedPathToSet(copied, cpy.toString());
+    modifications.getCopied().forEach((cpy) -> {
+      appendNormalizedPathToSet(copied, cpy.getSourcePath() + " --> " + cpy.getTargetPath());
     });
 
     fileChanges.setAdded(added);

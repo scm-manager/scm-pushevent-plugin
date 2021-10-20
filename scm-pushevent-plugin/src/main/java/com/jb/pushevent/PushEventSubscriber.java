@@ -131,7 +131,9 @@ public class PushEventSubscriber {
   private FileChanges collectPaths(HookContext eventContext, Repository repository, Changeset changeset) throws IOException {
     if (eventContext.isFeatureSupported(HookFeature.CHANGESET_PROVIDER)) {
       try (PathCollector collector = pathCollectorFactory.create(repository)) {
-        return collector.collectAll(List.of(changeset));
+        List<Changeset> tmpList = new ArrayList<>();
+        tmpList.add(changeset);
+        return collector.collectAll(tmpList);
       }
     }
     return new FileChanges(new ObjectMapper().createObjectNode()); //empty object
