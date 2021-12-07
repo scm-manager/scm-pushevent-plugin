@@ -53,7 +53,6 @@ public class PathCollector implements Closeable {
       .revision(changeset.getId())
       .getModifications();
 
-
     if (modifications != null) {
       collect(modifications);
     } else {
@@ -61,6 +60,10 @@ public class PathCollector implements Closeable {
     }
   }
 
+  /**
+   *
+   * @param modifications all modifications from the changeset
+   */
   private void collect(Modifications modifications) {
     modifications.getAdded().forEach((add) -> {
       appendNormalizedPathToSet(added, add.getPath());

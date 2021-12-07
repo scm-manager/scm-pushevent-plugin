@@ -18,7 +18,7 @@ public class Push {
   // todo NAMESPACE + Name ist eindeutig Name allein nicht!
 
   private String id;
-  private String author;
+  private String user;
 
   private String instanceId;
 
@@ -48,9 +48,9 @@ public class Push {
     node.put("id", this.id);
   }
 
-  public void setAuthor(String author) {
-    this.author = author;
-    node.put("author", this.author);
+  public void setUser(String user) {
+    this.user = user;
+    node.put("author", this.user);
   }
 
   public void setDatePushed(Long datePushed) {

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -19,6 +20,7 @@ public class Commit {
   private Long dateCommitted;
   private String author;
   private FileChanges fileChanges = new FileChanges(new ObjectMapper().createObjectNode());
+  private List<String> branches;
 
   public Commit(ObjectNode node) {
     this.node = node;
@@ -47,6 +49,12 @@ public class Commit {
   public void setAuthor(String author) {
     this.author = author;
     node.put("author", author);
+  }
+
+  public void setBranches(List<String> branches) {
+    this.branches = branches;
+    ArrayNode arrayNode = this.node.putArray("branches");
+    branches.forEach(arrayNode::add);
   }
 
   public JsonNode toJsonNode() {

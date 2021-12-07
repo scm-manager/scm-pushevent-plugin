@@ -29,15 +29,6 @@ public class EventsCloudoguRestApiService {
     return postRequest;
   }
 
-  /*
-  private ObjectNode wrapPush(Push push) {
-    final ObjectNode wrapper = objectMapper.createObjectNode();
-    wrapper.set("push", push.toJsonNode());
-    return wrapper;
-  }
-  */
-
-
   public void sendPush(Event eventDto) throws Exception {
     // Construct Request
     AdvancedHttpRequestWithBody postRequest = createPostRequest(eventDto.toJsonNode());

@@ -91,7 +91,6 @@ public class PushEventSubscriber {
     push.setRepositoryId(repository.getId());
     push.setRepositoryName(repository.getName());
     push.setRepositoryNamespace(repository.getNamespace());
-
     push.setInstanceId("NO YET IMPLEMENTED");
 
     Iterator changesetsIter = changesets.iterator();
@@ -105,12 +104,15 @@ public class PushEventSubscriber {
       commit.setCommitMessage(changeset.getDescription());
       commit.setFilesChanged(collectPaths(event.getContext(), repository, changeset));
       commit.setDateCommitted(changeset.getCreationDate());
+      // TODO find SCMM User
       commit.setAuthor(changeset.getAuthor().toString());
+      commit.setBranches(changeset.getBranches());
+
       push.addCommit(commit);
       // last commit reached
       if (!changesetsIter.hasNext()) {
         push.setDatePushed(commit.getDateCommitted());
-        push.setAuthor(changeset.getAuthor().toString());
+        push.setUser(changeset.getAuthor().toString());
       }
     }
     push.setCommits(push.getCommits()); // this is necessary as addCommit does not update the json-node
