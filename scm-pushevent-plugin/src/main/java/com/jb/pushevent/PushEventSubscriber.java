@@ -10,6 +10,8 @@ import com.jb.pushevent.pathcollect.PathCollectFactory;
 import com.jb.pushevent.pathcollect.PathCollector;
 import com.jb.pushevent.dto.Commit;
 import com.jb.pushevent.dto.Push;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sonia.scm.EagerSingleton;
@@ -22,6 +24,7 @@ import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryHookEvent;
 import sonia.scm.repository.api.HookContext;
 import sonia.scm.repository.api.HookFeature;
+import sonia.scm.security.Role;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -52,7 +55,6 @@ public class PushEventSubscriber {
 
   private void handlePushEvent(RepositoryHookEvent event) {
     Repository repository = event.getRepository();
-
     if (repository != null) {
       Iterable<Changeset> changesets = event.getContext().getChangesetProvider().getChangesets();
 
@@ -92,6 +94,19 @@ public class PushEventSubscriber {
     push.setRepositoryName(repository.getName());
     push.setRepositoryNamespace(repository.getNamespace());
     push.setInstanceId("NO YET IMPLEMENTED");
+    Subject subject = SecurityUtils.getSubject();
+
+    if (subject.hasRole(Role.USER)) {
+      String username = (String) subject.getPrincipal();
+
+      if (username != null && !username.equals("")) {
+        push.setUser(username);
+      } else {
+        logger.warn("username is null or empty");
+      }
+    } else {
+      logger.warn("subject has no user role, skip");
+    }
 
     Iterator changesetsIter = changesets.iterator();
 
@@ -112,7 +127,6 @@ public class PushEventSubscriber {
       // last commit reached
       if (!changesetsIter.hasNext()) {
         push.setDatePushed(commit.getDateCommitted());
-        push.setUser(changeset.getAuthor().toString());
       }
     }
     push.setCommits(push.getCommits()); // this is necessary as addCommit does not update the json-node

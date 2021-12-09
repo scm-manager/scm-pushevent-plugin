@@ -45,12 +45,12 @@ public class Push {
 
   public void setInstanceId(String id) {
     this.id = id;
-    node.put("id", this.id);
+    node.put("instanceId", this.id);
   }
 
   public void setUser(String user) {
     this.user = user;
-    node.put("author", this.user);
+    node.put("user", this.user);
   }
 
   public void setDatePushed(Long datePushed) {
