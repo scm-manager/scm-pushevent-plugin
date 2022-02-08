@@ -2,9 +2,7 @@ package com.jb.pushevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jb.pushevent.dto.Event;
-import com.jb.pushevent.dto.Push;
 import sonia.scm.net.ahc.AdvancedHttpClient;
 import sonia.scm.net.ahc.AdvancedHttpRequestWithBody;
 import sonia.scm.net.ahc.AdvancedHttpResponse;
@@ -13,7 +11,7 @@ import java.io.IOException;
 
 public class EventsCloudoguRestApiService {
 
-  private final static String URL = "http://127.0.0.1:5000/";
+  private final static String URL = "http://127.0.0.1:8088/";
 
   private final AdvancedHttpClient httpClient;
 
@@ -23,21 +21,24 @@ public class EventsCloudoguRestApiService {
     this.httpClient = httpClient;
   }
 
-  private AdvancedHttpRequestWithBody createPostRequest(JsonNode payload) {
-    final AdvancedHttpRequestWithBody postRequest = this.httpClient.post(URL);
+  private AdvancedHttpRequestWithBody createPutRequest(JsonNode payload) {
+    final AdvancedHttpRequestWithBody postRequest = this.httpClient.put(URL + "event/" + System.currentTimeMillis());
     postRequest.jsonContent(payload);
     return postRequest;
   }
 
   public void sendPush(Event eventDto) throws Exception {
     // Construct Request
-    AdvancedHttpRequestWithBody postRequest = createPostRequest(eventDto.toJsonNode());
+    AdvancedHttpRequestWithBody putRequest = createPutRequest(eventDto.toJsonNode());
 
-    final AdvancedHttpResponse postPushResponse;
+    final AdvancedHttpResponse putPushResponse;
     try {
-      postPushResponse = postRequest.request();
-      if (!postPushResponse.isSuccessful()) {
-        throw new Exception("TODO OWN EXCEPTION CLASS"); //TODO: build own exception class
+      putPushResponse = putRequest.request();
+      if (!putPushResponse.isSuccessful()) {
+        throw new Exception("Push wasn't successfully transmitted to events.cloudogu.com! " +
+          putPushResponse.getStatus() +
+          " " +
+          putPushResponse.getStatusText());
       }
     } catch (IOException e) {
       e.printStackTrace();
