@@ -22,14 +22,14 @@ public class PushEventConfiguration implements Validateable {
    * endpoint server url
    */
   private String url;
-  private boolean toggle;
+  private boolean active;
 
   public String getUrl() {
     return this.url;
   }
 
-  public boolean getToggle(){
-    return this.toggle;
+  public boolean getActive(){
+    return this.active;
   }
 
   @Override
@@ -37,9 +37,9 @@ public class PushEventConfiguration implements Validateable {
     return !url.isEmpty();
   }
 
-  public PushEventConfiguration(String url, Boolean toggle) {
+  public PushEventConfiguration(String url, Boolean active) {
     this.url = url;
-    this.toggle = toggle;
+    this.active = active;
   }
 
 }

@@ -55,7 +55,7 @@ public class PushEventSubscriber {
 
   @Subscribe
   public void onEvent(PostReceiveRepositoryHookEvent event) {
-    if (pushEventConfigurationStore.get().getToggle()) {
+    if (pushEventConfigurationStore.get().getActive()) {
       log.info("Propagate event: " + event.toString());
       handlePushEvent(event);
     } else {
