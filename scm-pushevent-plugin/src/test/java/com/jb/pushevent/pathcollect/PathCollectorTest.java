@@ -1,8 +1,10 @@
 package com.jb.pushevent.pathcollect;
 
+import com.jb.pushevent.dto.FileChanges;
 import lombok.SneakyThrows;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
 import org.mockito.Mock;
@@ -17,6 +19,8 @@ import sonia.scm.repository.api.RepositoryService;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.Assert.assertNotNull;
 
 class PathCollectorTest {
 
@@ -61,15 +65,9 @@ class PathCollectorTest {
 
   @SneakyThrows
   @Test
-  void collectAll() {
-    pathCollector.collectAll(changesetSet);
-  }
-
-  @SneakyThrows
-  @org.junit.jupiter.api.Test
-  void collectSingle() {
-    Changeset c = changesetSet.iterator().next();
-    pathCollector.collectSingle(c);
+  public void collectAll() {
+    FileChanges f = pathCollector.collectAll(changesetSet);
+    Assertions.assertNotNull(f);
   }
 
   @org.junit.jupiter.api.Test

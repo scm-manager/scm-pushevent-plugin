@@ -1,25 +1,25 @@
 package com.jb.pushevent;
 
+import com.jb.pushevent.config.PushEventConfigurationStore;
+import com.jb.pushevent.dto.Push;
 import com.jb.pushevent.pathcollect.PathCollectFactory;
 import com.jb.pushevent.pathcollect.PathCollector;
-import com.jb.pushevent.dto.Push;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import sonia.scm.net.ahc.AdvancedHttpClient;
-import sonia.scm.repository.*;
+import sonia.scm.repository.Changeset;
+import sonia.scm.repository.Person;
+import sonia.scm.repository.Repository;
+import sonia.scm.repository.RepositoryHookEvent;
 import sonia.scm.repository.api.HookChangesetBuilder;
 import sonia.scm.repository.api.HookContext;
 import sonia.scm.repository.api.HookFeature;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,6 +49,9 @@ class PushEventSubscriberTest {
   Repository mockRepository;
 
   @Mock
+  PushEventConfigurationStore mockPushEventConfigurationStore;
+
+  @Mock
   HookChangesetBuilder mockHookChangesetBuilder;
 
   @Inject
@@ -76,20 +79,15 @@ class PushEventSubscriberTest {
     when(mockContext.getChangesetProvider()).thenReturn(mockHookChangesetBuilder);
     when(mockHookChangesetBuilder.getChangesets()).thenReturn(changesets);
 
-    // when(mockPathCollector.collectAll(changesets)).thenReturn(new HashSet<>(Arrays.asList("filea", "fileb", "filec")));
-    // when(mockPathCollector.collectSingle(c1)).thenReturn(new HashSet<>(Arrays.asList("filea")));
-    // when(mockPathCollector.collectSingle(c2)).thenReturn(new HashSet<>(Arrays.asList("filea", "fileb")));
-    //  when(mockPathCollector.collectSingle(c3)).thenReturn(new HashSet<>(Arrays.asList("filea", "filec")));
-
     when(mockPathCollectorFactory.create(mockRepository)).thenReturn(mockPathCollector);
 
-    PushEventSubscriber pushEventSubscriber = new PushEventSubscriber(mockPathCollectorFactory, mockHttpClientProvider);
+    PushEventSubscriber pushEventSubscriber = new PushEventSubscriber(mockPathCollectorFactory, mockHttpClientProvider, mockPushEventConfigurationStore);
 
 
     try {
       Push push = pushEventSubscriber.createPushDtoFromEvent(mockRepository, changesets, mockRepositoryHookEvent);
       assertNotNull(push);
-      assertEquals("Bill Gates <bill.gates@mail.com>", push.getAuthor());
+      assertEquals("Bill Gates <bill.gates@mail.com>", push.getUser());
       assertEquals(3, push.getCommits().size());
     } catch (IOException e) {
       e.printStackTrace();

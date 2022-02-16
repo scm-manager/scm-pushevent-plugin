@@ -1,5 +1,16 @@
 {
   "scm-pushevent-plugin": {
-
+    "settings": {
+      "navLink": "Push Event Plugin",
+      "title": "Push Event Plugin Config"
+    },
+    "config": {
+      "form": {
+        "active": "aktiv",
+        "activeHelpText": "controls whether data is sent or not",
+        "endpointUrl": "URL zum Endpoint",
+        "endpointUrlHelpText": "url to which push data is sent"
+      }
+    }
   }
 }

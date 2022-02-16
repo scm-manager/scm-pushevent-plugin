@@ -2,6 +2,7 @@ package com.jb.pushevent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jb.pushevent.config.PushEventConfigurationStore;
 import com.jb.pushevent.dto.Event;
 import sonia.scm.net.ahc.AdvancedHttpClient;
 import sonia.scm.net.ahc.AdvancedHttpRequestWithBody;
@@ -11,20 +12,23 @@ import java.io.IOException;
 
 public class EventsCloudoguRestApiService {
 
-  private final static String URL = "http://127.0.0.1:8088/";
+  private String endpointUrl = "http://127.0.0.1:8088/";
 
   private final AdvancedHttpClient httpClient;
 
+
   private final ObjectMapper objectMapper = new ObjectMapper();
 
-  public EventsCloudoguRestApiService(AdvancedHttpClient httpClient) {
+
+  public EventsCloudoguRestApiService(AdvancedHttpClient httpClient, PushEventConfigurationStore pushEventConfigurationStore) {
     this.httpClient = httpClient;
+    endpointUrl = pushEventConfigurationStore.get().getUrl();
   }
 
   private AdvancedHttpRequestWithBody createPutRequest(JsonNode payload) {
-    final AdvancedHttpRequestWithBody postRequest = this.httpClient.put(URL + "event/" + System.currentTimeMillis());
-    postRequest.jsonContent(payload);
-    return postRequest;
+    final AdvancedHttpRequestWithBody putRequest = this.httpClient.put(endpointUrl + "event/" + System.currentTimeMillis());
+    putRequest.jsonContent(payload);
+    return putRequest;
   }
 
   public void sendPush(Event eventDto) throws Exception {

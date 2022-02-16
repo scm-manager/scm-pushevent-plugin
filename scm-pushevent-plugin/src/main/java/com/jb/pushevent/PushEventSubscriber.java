@@ -3,13 +3,16 @@ package com.jb.pushevent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.legman.Subscribe;
 import com.google.common.collect.Iterables;
+import com.jb.pushevent.config.PushEventConfigurationStore;
+import com.jb.pushevent.dto.Commit;
 import com.jb.pushevent.dto.Event;
 import com.jb.pushevent.dto.FileChanges;
+import com.jb.pushevent.dto.Push;
 import com.jb.pushevent.pathcollect.PathCollectFactory;
 import com.jb.pushevent.pathcollect.PathCollector;
-import com.jb.pushevent.dto.Commit;
-import com.jb.pushevent.dto.Push;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -17,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import sonia.scm.EagerSingleton;
 import sonia.scm.net.ahc.AdvancedHttpClient;
 import sonia.scm.plugin.Extension;
-import com.github.legman.Subscribe;
 import sonia.scm.repository.Changeset;
 import sonia.scm.repository.PostReceiveRepositoryHookEvent;
 import sonia.scm.repository.Repository;
@@ -29,10 +31,11 @@ import sonia.scm.security.Role;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-
+@Slf4j
 @Extension
 @EagerSingleton
 public class PushEventSubscriber {
@@ -41,16 +44,23 @@ public class PushEventSubscriber {
   private final Provider<AdvancedHttpClient> httpClientProvider;
 
   private static final Logger logger = LoggerFactory.getLogger(PushEventSubscriber.class);
+  private final PushEventConfigurationStore pushEventConfigurationStore;
 
   @Inject
-  public PushEventSubscriber(PathCollectFactory pathCollectorFactory, Provider<AdvancedHttpClient> httpClientProvider) {
+  public PushEventSubscriber(PathCollectFactory pathCollectorFactory, Provider<AdvancedHttpClient> httpClientProvider, PushEventConfigurationStore pushEventConfigurationStore) {
     this.pathCollectorFactory = pathCollectorFactory;
     this.httpClientProvider = httpClientProvider;
+    this.pushEventConfigurationStore = pushEventConfigurationStore;
   }
 
   @Subscribe
   public void onEvent(PostReceiveRepositoryHookEvent event) {
-    handlePushEvent(event);
+    if (pushEventConfigurationStore.get().getToggle()) {
+      log.info("Propagate event: " + event.toString());
+      handlePushEvent(event);
+    } else {
+      log.warn("Event was not propagated as the event propagation is turned off. If you want to propagate events go to the settings of this plugin and mark it as active.");
+    }
   }
 
   private void handlePushEvent(RepositoryHookEvent event) {
@@ -62,7 +72,7 @@ public class PushEventSubscriber {
         try {
           Event eventDto = handlePush(repository, changesets, event);
           // send Push to REST-Api
-          EventsCloudoguRestApiService restApiService = new EventsCloudoguRestApiService(httpClientProvider.get());
+          EventsCloudoguRestApiService restApiService = new EventsCloudoguRestApiService(httpClientProvider.get(), pushEventConfigurationStore);
           restApiService.sendPush(eventDto);
         } catch (IOException e) {
           e.printStackTrace();

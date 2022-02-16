@@ -22,6 +22,13 @@
  * SOFTWARE.
  */
 
-import { binder } from "@scm-manager/ui-extensions";
+import React from "react";
+import {ConfigurationBinder as configurationBinder} from "@scm-manager/ui-components";
+import GlobalPushEventConfiguration from "./GlobalPushEventConfiguration";
 
-binder.bind("", "");
+configurationBinder.bindGlobal(
+  "/pushevent/", "scm-pushevent-plugin.settings.navLink", "pushevent", GlobalPushEventConfiguration
+)
+
+//binder.bind("", "");
+

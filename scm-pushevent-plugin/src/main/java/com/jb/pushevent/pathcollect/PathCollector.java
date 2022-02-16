@@ -10,7 +10,8 @@ import sonia.scm.repository.api.RepositoryService;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The PathCollector class collects all types of modifications which are part of a changeset.
@@ -36,6 +37,13 @@ public class PathCollector implements Closeable {
     this.repositoryService = repositoryService;
   }
 
+  /**
+   * collect all changes from a changeset and return it as collections of various scopes (added, modified ...)
+   *
+   * @param changesets
+   * @return
+   * @throws IOException
+   */
   public FileChanges collectAll(Iterable<Changeset> changesets) throws IOException {
     added.clear();
     removed.clear();
@@ -48,23 +56,30 @@ public class PathCollector implements Closeable {
     return fileChanges;
   }
 
+  /**
+   * collects all changes in a changeset and fills the right sets corresponding to the change scope
+   *
+   * @param changeset all changes on that changeset
+   * @throws IOException
+   */
   private void collect(Changeset changeset) throws IOException {
     Modifications modifications = repositoryService.getModificationsCommand()
       .revision(changeset.getId())
       .getModifications();
 
     if (modifications != null) {
-      collect(modifications);
+      sortModificationsIntoAppropriateSet(modifications);
     } else {
       LOG.warn("there is no modifications for the changeset {}", changeset.getId());
     }
   }
 
   /**
+   * takes the modifications and sorts them in the respective sets of their scope
    *
    * @param modifications all modifications from the changeset
    */
-  private void collect(Modifications modifications) {
+  private void sortModificationsIntoAppropriateSet(Modifications modifications) {
     modifications.getAdded().forEach((add) -> {
       appendNormalizedPathToSet(added, add.getPath());
     });
