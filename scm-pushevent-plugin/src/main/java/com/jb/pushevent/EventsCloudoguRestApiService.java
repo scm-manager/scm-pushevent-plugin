@@ -13,6 +13,7 @@ import java.io.IOException;
 public class EventsCloudoguRestApiService {
 
   private String endpointUrl = "http://127.0.0.1:8088/";
+  private String token = "";
 
   private final AdvancedHttpClient httpClient;
 
@@ -23,11 +24,13 @@ public class EventsCloudoguRestApiService {
   public EventsCloudoguRestApiService(AdvancedHttpClient httpClient, PushEventConfigurationStore pushEventConfigurationStore) {
     this.httpClient = httpClient;
     endpointUrl = pushEventConfigurationStore.get().getUrl();
+    token = pushEventConfigurationStore.get().getToken();
   }
 
   private AdvancedHttpRequestWithBody createPutRequest(JsonNode payload) {
     final AdvancedHttpRequestWithBody putRequest = this.httpClient.put(endpointUrl + "event/" + System.currentTimeMillis());
     putRequest.jsonContent(payload);
+    putRequest.header("Authorization", "Bearer " + token);
     return putRequest;
   }
 

@@ -10,6 +10,7 @@ import lombok.Setter;
 @SuppressWarnings("java:S2160") // we do not need equals and hashcode in dto
 public class PushEventConfigurationDto extends HalRepresentation {
   private String url;
+  private String token;
   private Boolean active;
 
   @Override

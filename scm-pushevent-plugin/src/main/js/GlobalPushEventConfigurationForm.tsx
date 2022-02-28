@@ -27,7 +27,8 @@ import {useTranslation} from "react-i18next";
 
 export type Configuration = {
   url: string;
-  active: boolean
+  active: boolean;
+  token: string
 };
 
 type Props = {
@@ -40,13 +41,14 @@ const GlobalPushEventConfigurationForm: FC<Props> = ({initialConfiguration, onCo
 
   const [url, setUrl] = useState<string>(initialConfiguration.url);
   const [active, setActive] = useState<boolean>(initialConfiguration.active);
+  const [token, setToken] = useState<string>(initialConfiguration.token);
 
   useEffect(() => {
-    onConfigurationChange({url, active}, isValidConfig());
-  }, [url, active]);
+    onConfigurationChange({url, active, token}, isValidConfig());
+  }, [url, active, token]);
 
   const isValidConfig = () => {
-    if(url != null){
+    if(url != null && token != null){
       return url.length > 0;
     }
     return false;
@@ -63,6 +65,13 @@ const GlobalPushEventConfigurationForm: FC<Props> = ({initialConfiguration, onCo
         type="text"
         value={url}
         helpText={t("scm-pushevent-plugin.config.form.endpointUrlHelpText")}
+      />
+      <InputField
+        label={t("scm-pushevent-plugin.config.form.token")}
+        onChange={token => setToken(token)}
+        type="text"
+        value={token}
+        helpText={t("scm-pushevent-plugin.config.form.tokenHelpText")}
       />
     </>
   );

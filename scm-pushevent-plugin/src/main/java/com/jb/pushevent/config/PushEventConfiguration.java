@@ -22,23 +22,29 @@ public class PushEventConfiguration implements Validateable {
    * endpoint server url
    */
   private String url;
+  private String token;
   private boolean active;
 
   public String getUrl() {
     return this.url;
   }
 
-  public boolean getActive(){
+  public String getToken() {
+    return this.token;
+  }
+
+  public boolean getActive() {
     return this.active;
   }
 
   @Override
   public boolean isValid() {
-    return !url.isEmpty();
+    return !url.isEmpty() && !token.isEmpty();
   }
 
-  public PushEventConfiguration(String url, Boolean active) {
+  public PushEventConfiguration(String url, String token, Boolean active) {
     this.url = url;
+    this.token = token;
     this.active = active;
   }
 

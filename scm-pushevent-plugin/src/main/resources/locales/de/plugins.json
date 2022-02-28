@@ -7,9 +7,11 @@
     "config": {
       "form": {
         "active": "aktiv",
-        "activeHelpText": "controls whether data is sent or not",
+        "activeHelpText": "Solange diese Checkbox aktiv ist wird jedes Push Event verarbeitet.",
         "endpointUrl": "URL zum Endpoint",
-        "endpointUrlHelpText": "url to which push data is sent"
+        "endpointUrlHelpText": "URL zu demjenigen Endpunkt zu dem das Push Event Plugin seine Daten senden soll.",
+        "token": "Authentifizierungs token",
+        "tokenHelpText": "JWT Auth token. Dieser Token kann von einem Admin des events.clougogu.com Projekts generiert werden."
       }
     }
   }
