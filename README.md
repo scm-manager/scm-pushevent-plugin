@@ -4,14 +4,74 @@
   </a>
 </p>
 <h1 align="center">
-  scm-push-event-plugin
+   push event plugin
 </h1>
 
-plugin that sends json to a REST Enpoint when a push to scm-manager happens
+This plugin sends data to an endpoint every time a push is received in any repository.
+For this purpose a request is formed which contains meta information about the push as payload.
 
 ## Usage
 
-Find out how this plugin works on the [plugin documentation page](https://www.scm-manager.org/plugins/scm-pushevent-plugin/docs/).
+The requests are sent via PUT to the relative URL `/events/<id>`. 
+The sending of requests is disabled by default (see section Configuration below).
+No information is transmitted about WHAT has changed, only which files have been touched and by whom.
+The structure of the sent data is as follows:
+````json
+{
+  "application":"scmm",
+  "type":"push",
+  "id":"29192626-9a2f-11ec-b909-0242ac120002",
+  "time":"1646228770",
+  "data":{
+    "repositoryId":"2TSuOPqwJ3",
+    "repositoryName":"testrepo",
+    "repositoryNamespace":"scmadmin",
+    "user":"scmuser",
+    "datePushed":1642075169000,
+    "commits":[
+      {
+        "commitId":"d1a59c1ff4b90396f9d8913860a639ddbeeb9c16",
+        "message":"Init repo this is the first commit message",
+        "fileChanges":{
+          "added":[
+            "docker-compose.yml",
+            "index.html"
+          ],
+          "removed":[
+            "old.js"
+          ],
+          "modified":[
+
+          ],
+          "moved":[
+
+          ],
+          "copied":[
+
+          ]
+        },
+        "dateCommitted":1642075169000,
+        "author":"developer_1",
+        "branches":[
+          "master"
+        ]
+      }
+    ]
+  }
+}
+````
+### What can I do with this data?
+The data is used, for example, in a gameification service of Cloudogu GmbH, which awards archivements and points for previously defined challenges. 
+Otherwise, it is up to your free imagination what you do with it.
+
+## Configuration
+There are three main setting options. Firstly, the endpoint against which data is sent can be configured.
+The entered URL is extended with `events/<id>`. For example, the entered endpoint `https://www.my-service.com/` becomes `https://www.my-service.com/events/213sfduj132asd1`.
+
+The second setting option is a JWT token. This can be used to authenticate the requests to the endpoint.
+The token is set as header field `Authentification: Bearer <token>`.
+
+The last configuration option is the toggle `active` which controls if the plugin should send data. This option is default <b>OFF<b>  so as not to clog network traffic.
 
 ## Build and testing
 

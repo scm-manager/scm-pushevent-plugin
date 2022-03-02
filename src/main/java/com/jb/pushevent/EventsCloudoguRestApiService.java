@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jb.pushevent.config.PushEventConfigurationStore;
 import com.jb.pushevent.dto.Event;
+import lombok.extern.slf4j.Slf4j;
 import sonia.scm.net.ahc.AdvancedHttpClient;
 import sonia.scm.net.ahc.AdvancedHttpRequestWithBody;
 import sonia.scm.net.ahc.AdvancedHttpResponse;
 
 import java.io.IOException;
 
+@Slf4j
 public class EventsCloudoguRestApiService {
 
   private String endpointUrl = "http://127.0.0.1:8088/";
@@ -48,7 +50,7 @@ public class EventsCloudoguRestApiService {
           putPushResponse.getStatusText());
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("An IOException occurred during the processing of an event. The end point may not be reachable. You may check your plugin configuration. " + e.getMessage());
     }
   }
 

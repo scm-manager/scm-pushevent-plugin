@@ -75,9 +75,9 @@ public class PushEventSubscriber {
           EventsCloudoguRestApiService restApiService = new EventsCloudoguRestApiService(httpClientProvider.get(), pushEventConfigurationStore);
           restApiService.sendPush(eventDto);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("An IOException occurred during the processing of an event. The end point may not be reachable. You may check your plugin configuration. " + e.getMessage());
         } catch (Exception e) {
-          e.printStackTrace();
+          log.error("An Exception occurred during the processing of an event  " + e.getMessage());
         }
       } else {
         logger.warn("received hook without changesets");
