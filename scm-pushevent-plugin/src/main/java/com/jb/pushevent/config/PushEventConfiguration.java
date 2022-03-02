@@ -23,7 +23,7 @@ public class PushEventConfiguration implements Validateable {
    */
   private String url;
   private String token;
-  private boolean active;
+  private boolean active = false;
 
   public String getUrl() {
     return this.url;

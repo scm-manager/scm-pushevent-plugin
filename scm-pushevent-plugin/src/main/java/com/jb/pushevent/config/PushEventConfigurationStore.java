@@ -2,7 +2,6 @@ package com.jb.pushevent.config;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import sonia.scm.config.ConfigurationPermissions;
 import sonia.scm.store.ConfigurationStore;
 import sonia.scm.store.ConfigurationStoreFactory;
 
@@ -44,17 +43,5 @@ public class PushEventConfigurationStore {
   private ConfigurationStore<PushEventConfiguration> createStore() {
     return storeFactory.withType(PushEventConfiguration.class).withName(NAME).build();
   }
-
-  /*
-    public PushEventConfiguration getGlobalConfiguration() {
-    return store
-      .getOptional()
-      .orElse(new PushEventConfiguration());
-  }
-
-  public void setGlobalConfiguration(@Valid PushEventConfigurationDto updatedConfig, PushEventConfiguration configuration) {
-    this.store.set(configuration);
-  }
-  */
 }
 

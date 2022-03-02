@@ -2,25 +2,22 @@ package com.jb.pushevent.pathcollect;
 
 import com.jb.pushevent.dto.FileChanges;
 import lombok.SneakyThrows;
-
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
 import sonia.scm.repository.Changeset;
 import sonia.scm.repository.Person;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.api.RepositoryService;
 
-
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 class PathCollectorTest {
 
@@ -59,15 +56,22 @@ class PathCollectorTest {
 
   @org.junit.jupiter.api.BeforeEach
   void setUp() {
-    // pathCollector = pathCollectorFactory.create(repository);
+    pathCollector = pathCollectorFactory.create(repository);
   }
 
 
-  @SneakyThrows
   @Test
   public void collectAll() {
-    FileChanges f = pathCollector.collectAll(changesetSet);
+    FileChanges f = null;
+    try {
+      f = pathCollector.collectAll(changesetSet);
+    } catch (IOException e) {
+      Assertions.fail();
+    }
     Assertions.assertNotNull(f);
+    System.out.println(f.getAdded());
+   // Assertions.assertEquals(f.getAdded());
+
   }
 
   @org.junit.jupiter.api.Test

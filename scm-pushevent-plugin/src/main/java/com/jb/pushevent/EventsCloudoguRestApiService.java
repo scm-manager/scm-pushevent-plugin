@@ -42,7 +42,7 @@ public class EventsCloudoguRestApiService {
     try {
       putPushResponse = putRequest.request();
       if (!putPushResponse.isSuccessful()) {
-        throw new Exception("Push wasn't successfully transmitted to events.cloudogu.com! " +
+        throw new Exception("Push wasn't successfully transmitted to Endpoint." +
           putPushResponse.getStatus() +
           " " +
           putPushResponse.getStatusText());

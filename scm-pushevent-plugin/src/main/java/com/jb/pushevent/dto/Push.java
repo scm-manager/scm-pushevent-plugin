@@ -15,12 +15,10 @@ public class Push {
 
   private final ObjectNode node;
 
-  // todo NAMESPACE + Name ist eindeutig Name allein nicht!
-
   private String id;
   private String user;
 
-  private String instanceId;
+ // private String instanceId;
 
   private Long datePushed; // client timestamp
 
@@ -30,10 +28,6 @@ public class Push {
 
   private Set<Commit> commits;
 
-  // private Commit lastCommit;
-
-  // private Set<String> filesChangedOverall = new HashSet<>();
-
   public Push(ObjectNode node) {
     this.node = node;
   }
@@ -41,11 +35,6 @@ public class Push {
   public void setId(String id) {
     this.id = id;
     node.put("id", this.id);
-  }
-
-  public void setInstanceId(String id) {
-    this.id = id;
-    node.put("instanceId", this.id);
   }
 
   public void setUser(String user) {

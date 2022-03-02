@@ -88,7 +88,7 @@ public class PushEventSubscriber {
   }
 
   private Event handlePush(Repository repository, Iterable<Changeset> changesets, RepositoryHookEvent event) throws IOException {
-    Push push = createPushDtoFromEvent(repository, changesets, event);
+    Push push = createPushDtoFromEvent(repository, changesets, event,  SecurityUtils.getSubject());
     Event eventDto = new Event(new ObjectMapper().createObjectNode());
     eventDto.setData(push);
     eventDto.setId("id");
@@ -96,15 +96,15 @@ public class PushEventSubscriber {
     return eventDto;
   }
 
-  Push createPushDtoFromEvent(Repository repository, Iterable<Changeset> changesets, RepositoryHookEvent event) throws IOException {
+  Push createPushDtoFromEvent(Repository repository, Iterable<Changeset> changesets, RepositoryHookEvent event, Subject subject) throws IOException {
     ObjectNode objectNode = new ObjectMapper().createObjectNode();
     Push push = new Push(objectNode);
 
     push.setRepositoryId(repository.getId());
     push.setRepositoryName(repository.getName());
     push.setRepositoryNamespace(repository.getNamespace());
-    push.setInstanceId("NO YET IMPLEMENTED");
-    Subject subject = SecurityUtils.getSubject();
+    // push.setInstanceId("NO YET IMPLEMENTED"); Maybe a InstanceId can be used later
+   ;
 
     if (subject.hasRole(Role.USER)) {
       String username = (String) subject.getPrincipal();
@@ -127,11 +127,14 @@ public class PushEventSubscriber {
 
       commit.setCommitId(changeset.getId());
       commit.setCommitMessage(changeset.getDescription());
-      commit.setFilesChanged(collectPaths(event.getContext(), repository, changeset));
       commit.setDateCommitted(changeset.getCreationDate());
       // TODO find SCMM User
       commit.setAuthor(changeset.getAuthor().toString());
       commit.setBranches(changeset.getBranches());
+
+      FileChanges fileChanges = collectPaths(event.getContext(), repository, changeset);
+
+      commit.setFilesChanged(fileChanges);
 
       push.addCommit(commit);
       // last commit reached
@@ -141,17 +144,6 @@ public class PushEventSubscriber {
     }
     push.setCommits(push.getCommits()); // this is necessary as addCommit does not update the json-node
     return push;
-  }
-
-
-  private FileChanges collectAllPaths(HookContext eventContext, Repository repository) throws IOException {
-    if (eventContext.isFeatureSupported(HookFeature.CHANGESET_PROVIDER)) {
-
-      try (PathCollector collector = pathCollectorFactory.create(repository)) {
-        return collector.collectAll(eventContext.getChangesetProvider().getChangesets());
-      }
-    }
-    return new FileChanges(new ObjectMapper().createObjectNode()); //empty object
   }
 
   private FileChanges collectPaths(HookContext eventContext, Repository repository, Changeset changeset) throws IOException {
