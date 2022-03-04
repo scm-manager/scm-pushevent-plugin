@@ -28,17 +28,22 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import sonia.scm.repository.Changeset;
+import sonia.scm.repository.Modifications;
 import sonia.scm.repository.Person;
 import sonia.scm.repository.Repository;
+import sonia.scm.repository.api.ModificationsCommandBuilder;
 import sonia.scm.repository.api.RepositoryService;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.mockito.Mockito.when;
 
 class PathCollectorTest {
 
@@ -48,17 +53,21 @@ class PathCollectorTest {
   Repository repository;
   @Mock
   PathCollectFactory pathCollectorFactory;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  ModificationsCommandBuilder modificationsCommandBuilder;
   Set<Changeset> changesetSet;
   PathCollector pathCollector;
 
   @BeforeEach
-  public void init() {
+  public void init() throws IOException {
     MockitoAnnotations.initMocks(this);
     repositoryService = Mockito.mock(RepositoryService.class);
     repository = Mockito.mock(Repository.class);
 
     pathCollectorFactory = Mockito.mock(PathCollectFactory.class);
-    Mockito.when(pathCollectorFactory.create(repository)).thenReturn(new PathCollector(repositoryService));
+    when(pathCollectorFactory.create(repository)).thenReturn(new PathCollector(repositoryService));
+    when(repositoryService.getModificationsCommand()).thenReturn(modificationsCommandBuilder);
+    when(modificationsCommandBuilder.getModifications()).thenReturn(new Modifications("a"));
 
     changesetSet = new HashSet<>();
 
