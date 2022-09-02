@@ -65,7 +65,7 @@ public class EventsCloudoguRestApiService {
     AdvancedHttpRequestWithBody putRequest = createPutRequest(eventDto.toJsonNode());
 
     try {
-      AdvancedHttpResponse putPushResponse = putRequest.request();
+      AdvancedHttpResponse putPushResponse = putRequest.spanKind("PushEvent").request();
       if (!putPushResponse.isSuccessful()) {
         log.error("Push was not transmitted to endpoint");
       }
