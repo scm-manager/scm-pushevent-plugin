@@ -46,7 +46,7 @@ dependencies {
 scmPlugin {
   scmVersion = "2.0.0"
   displayName = "Push Event"
-  description = "plugin that sends json to a REST Enpoint when a push to scm-manager happens"
+  description = "Sends json to a REST Enpoint when a push to SCM-Manager happens"
 
   author = "Cloudogu GmbH"
   category = "Workflow"
