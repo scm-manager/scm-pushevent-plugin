@@ -71,7 +71,7 @@ The entered URL is extended with `events/<id>`. For example, the entered endpoin
 The second setting option is a JWT token. This can be used to authenticate the requests to the endpoint.
 The token is set as header field `Authentification: Bearer <token>`.
 
-The last configuration option is the toggle `active` which controls if the plugin should send data. This option is default <b>OFF<b>  so as not to clog network traffic.
+The last configuration option is the toggle `active` which controls if the plugin should send data. This option is default <b>OFF</b>  so as not to clog network traffic.
 
 ## Build and testing
 
